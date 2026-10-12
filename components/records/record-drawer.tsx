@@ -10,7 +10,7 @@ function fieldInput(column: RecordColumn) {
   if (column.type === "date") return <DatePicker format="DD/MM/YYYY" style={{ width: "100%" }} placeholder="Chọn ngày" />;
   if (column.type === "select") return <Select allowClear showSearch options={column.options?.map(value => ({ value, label: value }))} placeholder="Chọn giá trị" />;
   if (column.type === "checkbox") return <Checkbox>Đã thực hiện</Checkbox>;
-  if (["number", "currency"].includes(column.type)) return <InputNumber style={{ width: "100%" }} min={0} decimalSeparator="," formatter={(value, info) => info.userTyping ? info.input : value === undefined || value === null ? "" : numberVN(Number(value))} parser={value => parseNumber(value) ?? 0} addonAfter={column.type === "currency" ? "₫" : column.id === "area" ? "m²" : undefined} />;
+  if (["number", "currency"].includes(column.type)) return <InputNumber<number> style={{ width: "100%" }} min={0} decimalSeparator="," formatter={(value, info) => info.userTyping ? info.input : value === undefined || value === null ? "" : numberVN(Number(value))} parser={value => parseNumber(value) ?? 0} addonAfter={column.type === "currency" ? "₫" : column.id === "area" ? "m²" : undefined} />;
   if (column.id === "notes") return <Input.TextArea rows={3} placeholder="Nhập ghi chú cho hồ sơ…" />;
   return <Input placeholder={`Nhập ${column.label.toLowerCase()}`} />;
 }
