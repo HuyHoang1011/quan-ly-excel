@@ -1,0 +1,16 @@
+"use client";
+import { useState } from "react";
+import { Button, Calendar, DatePicker, Empty, Input } from "antd";
+import { CalendarDays, Plus, Search, FileText, ChevronRight } from "lucide-react";
+import dayjs from "dayjs";
+import { useDemo } from "@/components/providers";
+import { PageHeading } from "@/components/shared/ui";
+import { dateVN, normalize, today } from "@/lib/utils/format";
+import { AssignmentDocument } from "./assignment-document";
+export function AssignmentsPage() {
+  const { data } = useDemo(); const [date, setDate] = useState(today); const [month, setMonth] = useState(today); const [search, setSearch] = useState(""); const [revision, setRevision] = useState(0); const [createOpen, setCreateOpen] = useState(false);
+  const existing = data.assignments.find(a => a.date === date);
+  const history = [...data.assignments].filter(a => normalize(`${a.title} ${dateVN(a.date)} ${a.content.replace(/<[^>]*>/g, " ")}`).includes(normalize(search))).sort((a, b) => b.date.localeCompare(a.date));
+  function select(value: string) { setDate(value); setMonth(value); }
+  return <><PageHeading eyebrow="TỔ CHỨC CÔNG VIỆC" title="Giao việc hàng ngày" description="Một trang ghi chép rõ ràng cho mỗi ngày làm việc." actions={<Button icon={<CalendarDays size={16} />} onClick={() => select(today())}>Về hôm nay</Button>} /><div className="assignments-layout"><aside className="assignment-sidebar"><section className="panel mini-calendar"><Calendar fullscreen={false} value={dayjs(month)} onPanelChange={value => setMonth(value.format("YYYY-MM-DD"))} onSelect={(value, info) => { if (info.source === "date") select(value.format("YYYY-MM-DD")); }} fullCellRender={(value, info) => info.type === "date" ? <div className={`calendar-cell ${value.format("YYYY-MM-DD") === date ? "is-selected" : ""}`}><span>{value.date()}</span>{data.assignments.some(a => a.date === value.format("YYYY-MM-DD")) && <i />}</div> : info.originNode} /><div className="calendar-legend"><i /> Ngày đã có nội dung</div></section><section className="panel history-panel"><div className="history-heading"><h2>Lịch sử giao việc</h2><span>{data.assignments.length}</span></div><Input prefix={<Search size={15} />} placeholder="Tìm nội dung đã lưu…" allowClear value={search} onChange={e => setSearch(e.target.value)} /><div className="new-assignment"><DatePicker open={createOpen} onOpenChange={setCreateOpen} aria-label="Chọn ngày giao việc" value={dayjs(date)} format="DD/MM/YYYY" allowClear={false} onChange={value => { if (value) select(value.format("YYYY-MM-DD")); }} /><Button aria-label="Tạo nội dung giao việc mới" icon={<Plus size={17} />} onClick={() => setCreateOpen(true)}>Tạo mới</Button></div><p className="history-hint">Chọn ngày trống để tạo nội dung mới.</p><div className="history-list">{history.length ? history.map(a => <button key={a.id} className={date === a.date ? "active" : ""} onClick={() => select(a.date)}><FileText size={19} /><span><strong>{dateVN(a.date)}</strong><small>{a.title || "Chưa đặt tiêu đề"}</small></span><ChevronRight size={15} /></button>) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Không có nội dung phù hợp" />}</div></section></aside><AssignmentDocument key={`${date}-${revision}`} date={date} initial={existing} onDeleted={() => setRevision(r => r + 1)} /></div></>;
+}

@@ -1,0 +1,15 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
+import { Alert, Avatar, Button, Drawer, Tag } from "antd";
+import { LayoutDashboard, FolderOpen, CalendarDays, SlidersHorizontal, Layers3, Menu, ChevronRight, CircleHelp, HardDrive, MapPinned } from "lucide-react";
+import { useDemo } from "@/components/providers";
+import { dateVN, today } from "@/lib/utils/format";
+const nav = [{ href: "/", label: "Tổng quan", icon: LayoutDashboard }, { href: "/ho-so", label: "Danh sách hồ sơ", icon: FolderOpen }, { href: "/giao-viec", label: "Giao việc hàng ngày", icon: CalendarDays }, { href: "/cai-dat", label: "Cài đặt cột", icon: SlidersHorizontal }];
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname(); const [open, setOpen] = useState(false); const { warning } = useDemo();
+  const current = nav.find(item => item.href === pathname) ?? nav[0];
+  const sidebar = <><Link href="/" className="brand"><span className="brand-icon"><MapPinned size={25} /></span><span>ĐỊA CHÍNH<span className="brand-sub">QUẢN LÝ HỒ SƠ ĐO ĐẠC</span></span></Link><div className="workspace-label">KHÔNG GIAN LÀM VIỆC</div><nav className="navigation">{nav.map(({ href, label, icon: Icon }) => <Link key={href} href={href} onClick={() => setOpen(false)} className={pathname === href ? "active" : ""}><Icon size={19} /><span>{label}</span>{pathname === href && <ChevronRight size={15} />}</Link>)}</nav><div className="sidebar-bottom"><div className="sidebar-tip"><Layers3 size={23} /><strong>Mọi hồ sơ, một nơi lưu trữ</strong><p>Theo dõi rõ ràng. Nhập liệu dễ dàng. Làm việc hiệu quả hơn.</p></div><div className="demo-label"><span className="online-dot" /> Phiên bản trải nghiệm <span>v1.0</span></div></div></>;
+  return <div className="app-shell"><aside className="sidebar">{sidebar}</aside><Drawer open={open} onClose={() => setOpen(false)} placement="left" width={260} styles={{ body: { padding: 0, background: "#101f39" } }} className="mobile-drawer">{sidebar}</Drawer><div className="app-main"><header className="app-header"><div className="breadcrumb"><Button className="mobile-menu" type="text" aria-label="Mở menu" icon={<Menu size={20} />} onClick={() => setOpen(true)} /><span className="breadcrumb-home">Không gian làm việc</span><ChevronRight size={14} /><strong>{current.label}</strong></div><div className="header-right"><span className="header-date"><CalendarDays size={16} />{dateVN(today())}</span><span className="header-divider" /><Avatar style={{ background: "#e8efff", color: "#2563eb", fontWeight: 700 }}>AD</Avatar><div className="account-copy"><strong>Tài khoản demo</strong><small>Không gian cá nhân</small></div></div></header><main className="page-content">{warning && <Alert type="warning" showIcon message="Lưu trữ trình duyệt" description={warning} className="storage-warning" />}{children}</main><footer className="app-footer"><span><HardDrive size={13} /> Dữ liệu được lưu trên trình duyệt này</span><span><CircleHelp size={13} /> Hệ thống Quản lý Hồ sơ Đo đạc <Tag bordered={false}>DEMO</Tag></span></footer></div></div>;
+}
